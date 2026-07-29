@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ebalo.id</title>
+    <!-- Подключаем клиент Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -118,14 +120,13 @@
             overflow: hidden;
             border: 1px solid #333333;
             transition: transform 0.2s ease;
-            position: relative;
         }
 
         .card:hover {
             transform: translateY(-4px);
         }
 
-        /* Пропорциональный блок картинки 16:9 */
+        /* Превью 16:9 */
         .thumb-wrapper {
             display: block;
             position: relative;
@@ -212,7 +213,7 @@
     </header>
 
     <main class="container">
-        <!-- Поле добавления -->
+        <!-- Форма публикаций -->
         <div class="publish-form">
             <input 
                 type="text" 
@@ -228,41 +229,44 @@
     </main>
 
     <script>
-        // Начальный список видео (если хранилище пустое)
-        const initialVideos = [
-            { id: "jSDCHwrz1Lo", date: "сегодня" },
-            { id: "iztO22wM9dI", date: "сегодня" }
-        ];
+        // ВСТАВЬ СЮДА СВОИ ДАННЫЕ ИЗ SUPABASE (Settings -> API)
+        const SUPABASE_URL = 'sb_publishable_rwQC4kQmW0X6_emf7Sr00g_c4UTc7gC';
+        const SUPABASE_KEY = 'sb_publishable_rwQC4kQmW0X6_emf7Sr00g_c4UTc7gC';
 
-        // Достаём список из localStorage или берём дефолтный
-        function getSavedVideos() {
-            const saved = localStorage.getItem('my_youtube_videos');
-            return saved ? JSON.parse(saved) : initialVideos;
+        const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Получаем все видео из онлайн базы данных
+        async function fetchVideos() {
+            const { data, error } = await db
+                .from('videos')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Ошибка загрузки данных:', error);
+                return;
+            }
+
+            renderFeed(data);
         }
 
-        // Сохраняем в localStorage
-        function saveVideos(videos) {
-            localStorage.setItem('my_youtube_videos', JSON.stringify(videos));
-        }
-
-        // Отрисовка всех видео в ленте
-        function renderFeed() {
+        // Отрисовка видео
+        function renderFeed(videos) {
             const feedGrid = document.getElementById('feedGrid');
-            feedGrid.innerHTML = ''; // очищаем перед отрисовкой
-            const videos = getSavedVideos();
+            feedGrid.innerHTML = '';
 
             videos.forEach(video => {
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
-                    <a href="https://www.youtube.com/watch?v=${video.id}" target="_blank" class="thumb-wrapper">
-                        <img src="https://img.youtube.com/vi/${video.id}/hqdefault.jpg" alt="Превью" class="thumb-img">
+                    <a href="https://www.youtube.com/watch?v=${video.youtube_id}" target="_blank" class="thumb-wrapper">
+                        <img src="https://img.youtube.com/vi/${video.youtube_id}/hqdefault.jpg" alt="Превью" class="thumb-img">
                         <div class="play-btn"></div>
                     </a>
                     <div class="card-info">
                         <div class="card-user">
-                            <span class="user-name">user</span>
-                            <span>${video.date}</span>
+                            <span class="user-name">${video.user_name || 'user'}</span>
+                            <span>сегодня</span>
                         </div>
                         <div class="card-title">Видеозапись</div>
                     </div>
@@ -271,35 +275,40 @@
             });
         }
 
-        // Вытаскиваем ID из ссылки
+        // Извлечение ID из ссылки
         function extractVideoId(url) {
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
             const match = url.match(regExp);
             return (match && match[2].length === 11) ? match[2] : null;
         }
 
-        // Функция добавления нового видео
-        function addVideo() {
+        // Добавление видео в базу данных
+        async function addVideo() {
             const input = document.getElementById('youtubeUrl');
             const url = input.value.trim();
             const videoId = extractVideoId(url);
 
             if (!videoId) {
-                alert('Вставьте корректную ссылку на YouTube!');
+                alert('Вставьте нормальную ссылку на YouTube!');
                 return;
             }
 
-            const videos = getSavedVideos();
-            // Добавляем новое видео в НАЧАЛО массива
-            videos.unshift({ id: videoId, date: "только что" });
+            // Отправляем запись в Supabase
+            const { error } = await db
+                .from('videos')
+                .insert([{ youtube_id: videoId, user_name: 'user' }]);
 
-            saveVideos(videos);
-            renderFeed();
-            input.value = '';
+            if (error) {
+                alert('Не удалось опубликовать видео!');
+                console.error(error);
+            } else {
+                input.value = '';
+                fetchVideos(); // Обновляем ленту для всех
+            }
         }
 
-        // Запускаем отрисовку при загрузке страницы
-        renderFeed();
+        // Запуск при старте
+        fetchVideos();
     </script>
 
 </body>
