@@ -73,12 +73,12 @@
             transform: translateY(-4px);
         }
 
-        /* Превью карточки в нормальном пропорции 16:9 */
+        /* Область превью 16:9 */
         .thumb-wrapper {
             display: block;
             position: relative;
             width: 100%;
-            padding-top: 56.25%; /* Пропорция 16:9 */
+            padding-top: 56.25%;
             background-color: #000;
             text-decoration: none;
         }
@@ -92,7 +92,7 @@
             object-fit: cover;
         }
 
-        /* Кнопка Play по центру */
+        /* Кнопка Play */
         .play-btn {
             position: absolute;
             top: 50%;
@@ -119,7 +119,7 @@
             border-color: transparent transparent transparent #ffffff;
         }
 
-        /* Текст под видео */
+        /* Информация под видео */
         .card-info {
             padding: 15px;
         }
@@ -147,14 +147,13 @@
 <body>
 
     <header>
-        <a href="#" class="logo"><span>🐸</span> ebalo.id</a>
+        <a href="#" class="logo">ebalo.id</a>
         <nav><a href="#">Лента</a></nav>
     </header>
 
     <main class="container">
         <div class="feed-grid">
             <div class="card">
-                <!-- Прямая ссылка на видео без фреймов -->
                 <a href="https://www.youtube.com/watch?v=iztO22wM9dI" target="_blank" class="thumb-wrapper">
                     <img src="https://img.youtube.com/vi/iztO22wM9dI/maxresdefault.jpg" alt="Превью" class="thumb-img">
                     <div class="play-btn"></div>
