@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ebalo.id</title>
-    <!-- Подключаем клиент Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
@@ -196,6 +195,14 @@
             font-weight: 600;
             color: #ffffff;
         }
+
+        .error-msg {
+            color: #ff4d4d;
+            background: #2a1515;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #552222;
+        }
     </style>
 </head>
 <body>
@@ -213,7 +220,6 @@
     </header>
 
     <main class="container">
-        <!-- Форма публикаций -->
         <div class="publish-form">
             <input 
                 type="text" 
@@ -224,33 +230,43 @@
             <button class="publish-btn" onclick="addVideo()">Опубликовать</button>
         </div>
 
-        <!-- Лента -->
-        <div class="feed-grid" id="feedGrid"></div>
+        <div class="feed-grid" id="feedGrid">Загрузка видео...</div>
     </main>
 
     <script>
-        // ВСТАВЬ СЮДА СВОИ ДАННЫЕ ИЗ SUPABASE (Settings -> API)
-        const SUPABASE_URL = 'sb_publishable_rwQC4kQmW0X6_emf7Sr00g_c4UTc7gC';
-        const SUPABASE_KEY = 'sb_publishable_rwQC4kQmW0X6_emf7Sr00g_c4UTc7gC';
+        // Убедись, что тут вставлены твои актуальные ключи из Supabase (Settings -> API)
+        const SUPABASE_URL = 'ТВОЙ_PROJECT_URL';
+        const SUPABASE_KEY = 'ТВОЙ_ANON_PUBLIC_KEY';
 
         const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Получаем все видео из онлайн базы данных
         async function fetchVideos() {
+            const feedGrid = document.getElementById('feedGrid');
+
+            // Запрашиваем данные без строгого порядка, чтобы избежать ошибки missing column
             const { data, error } = await db
                 .from('videos')
-                .select('*')
-                .order('created_at', { ascending: false });
+                .select('*');
 
             if (error) {
-                console.error('Ошибка загрузки данных:', error);
+                console.error('Ошибка Supabase:', error);
+                feedGrid.innerHTML = `
+                    <div class="error-msg">
+                        <b>Ошибка подключения к базе:</b> ${error.message}<br>
+                        Проверь, выключен ли RLS в настройках таблицы Supabase!
+                    </div>
+                `;
                 return;
             }
 
-            renderFeed(data);
+            if (!data || data.length === 0) {
+                feedGrid.innerHTML = '<p style="color: #aaa;">Лента пока пуста. Опубликуй первое видео!</p>';
+                return;
+            }
+
+            renderFeed(data.reverse()); // Разворачиваем, чтобы новые были сверху
         }
 
-        // Отрисовка видео
         function renderFeed(videos) {
             const feedGrid = document.getElementById('feedGrid');
             feedGrid.innerHTML = '';
@@ -275,14 +291,12 @@
             });
         }
 
-        // Извлечение ID из ссылки
         function extractVideoId(url) {
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
             const match = url.match(regExp);
             return (match && match[2].length === 11) ? match[2] : null;
         }
 
-        // Добавление видео в базу данных
         async function addVideo() {
             const input = document.getElementById('youtubeUrl');
             const url = input.value.trim();
@@ -293,21 +307,19 @@
                 return;
             }
 
-            // Отправляем запись в Supabase
             const { error } = await db
                 .from('videos')
                 .insert([{ youtube_id: videoId, user_name: 'user' }]);
 
             if (error) {
-                alert('Не удалось опубликовать видео!');
+                alert('Ошибка при публикации: ' + error.message);
                 console.error(error);
             } else {
                 input.value = '';
-                fetchVideos(); // Обновляем ленту для всех
+                fetchVideos();
             }
         }
 
-        // Запуск при старте
         fetchVideos();
     </script>
 
