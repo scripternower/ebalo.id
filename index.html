@@ -62,7 +62,7 @@
             padding: 0 20px;
         }
 
-        /* Форма добавления видео */
+        /* Форма публикации */
         .publish-form {
             display: flex;
             gap: 10px;
@@ -104,7 +104,7 @@
             background-color: #8ce000;
         }
 
-        /* Лента */
+        /* Сетка Ленты */
         .feed-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
@@ -124,7 +124,7 @@
             transform: translateY(-4px);
         }
 
-        /* Превью 16:9 */
+        /* Пропорциональный блок картинки 16:9 */
         .thumb-wrapper {
             display: block;
             position: relative;
@@ -171,7 +171,7 @@
             border-color: transparent transparent transparent #ffffff;
         }
 
-        /* Инфо о посте */
+        /* Описание карточки */
         .card-info {
             padding: 15px;
         }
@@ -202,7 +202,7 @@
         <a href="#" class="logo">
             <img 
                 src="https://i.pinimg.com/736x/12/69/82/1269823620ab6546fba9644d1f741193.jpg" 
-                alt="Логотип" 
+                alt="Лого" 
                 class="logo-img"
             >
             ebalo.id
@@ -211,7 +211,7 @@
     </header>
 
     <main class="container">
-        <!-- Форма для вставки ссылки -->
+        <!-- Поле добавления -->
         <div class="publish-form">
             <input 
                 type="text" 
@@ -222,9 +222,10 @@
             <button class="publish-btn" onclick="addVideo()">Опубликовать</button>
         </div>
 
-        <!-- Лента карточек -->
+        <!-- Лента -->
         <div class="feed-grid" id="feedGrid">
-            <!-- Первое видео -->
+
+            <!-- Карточка 1 -->
             <div class="card">
                 <a href="https://www.youtube.com/watch?v=iztO22wM9dI" target="_blank" class="thumb-wrapper">
                     <img src="https://img.youtube.com/vi/iztO22wM9dI/hqdefault.jpg" alt="Превью" class="thumb-img">
@@ -239,7 +240,7 @@
                 </div>
             </div>
 
-            <!-- Второе видео -->
+            <!-- Карточка 2 -->
             <div class="card">
                 <a href="https://www.youtube.com/watch?v=jSDCHwrz1Lo" target="_blank" class="thumb-wrapper">
                     <img src="https://img.youtube.com/vi/jSDCHwrz1Lo/hqdefault.jpg" alt="Превью" class="thumb-img">
@@ -253,31 +254,28 @@
                     <div class="card-title">Видеозапись</div>
                 </div>
             </div>
+
         </div>
     </main>
 
     <script>
-        // Функция извлечения ID видео из ссылки YouTube
         function extractVideoId(url) {
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
             const match = url.match(regExp);
             return (match && match[2].length === 11) ? match[2] : null;
         }
 
-        // Функция добавления нового видео в ленту
         function addVideo() {
             const input = document.getElementById('youtubeUrl');
             const url = input.value.trim();
             const videoId = extractVideoId(url);
 
             if (!videoId) {
-                alert('Пожалуйста, вставьте корректную ссылку на YouTube!');
+                alert('Вставьте нормальную ссылку на YouTube!');
                 return;
             }
 
             const feedGrid = document.getElementById('feedGrid');
-
-            // Создаем новую карточку
             const card = document.createElement('div');
             card.className = 'card';
             card.innerHTML = `
@@ -294,10 +292,7 @@
                 </div>
             `;
 
-            // Добавляем новое видео в начало ленты
             feedGrid.prepend(card);
-
-            // Очищаем поле ввода
             input.value = '';
         }
     </script>
