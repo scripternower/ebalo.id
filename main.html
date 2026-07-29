@@ -3,221 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Карточка как на фото</title>
+    <title>ebalo.id</title>
     <style>
-        /* Сброс стилей по умолчанию */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-        }
-
-        /* Задний фон всей страницы */
-        body {
-            background-color: #121212;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #1a1a1a;
             color: #ffffff;
+            min-height: 100vh;
         }
 
-        /* --- Основной контейнер карточки --- */
+        /* Шапка */
+        header {
+            display: flex;
+            align-items: center;
+            padding: 15px 30px;
+            background-color: #121212;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #76b900;
+            margin-right: 40px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        nav a {
+            color: #76b900;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            padding-bottom: 4px;
+            border-bottom: 2px solid #76b900;
+        }
+
+        /* Лента */
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .feed-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 20px;
+        }
+
+        /* Карточка */
         .card {
-            width: 380px; /* Ширина как на фото */
-            background-color: #1f1f1f; /* Темный фон карточки */
+            background-color: #242424;
             border-radius: 12px;
-            overflow: hidden; /* Чтобы элементы не вылезали за закругленные углы */
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            border: 1px solid #333333;
+            transition: transform 0.2s ease;
         }
 
-        /* --- Контейнер для псевдо-видео-плеера --- */
-        .video-thumbnail {
-            position: relative; /* Чтобы размещать элементы внутри него абсолютно */
+        .card:hover {
+            transform: translateY(-4px);
+        }
+
+        /* Контейнер превью 16:9 */
+        .video-link {
+            display: block;
+            position: relative;
             width: 100%;
-            height: 480px; /* Высота, похожая на фото */
-            background-color: #000000; /* Черный фон для "видео" */
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            padding-top: 56.25%; /* Обычное соотношение 16:9 */
+            background-color: #000;
+            overflow: hidden;
         }
 
-        /* --- Элементы внутри псевдо-плеера (абсолютное позиционирование) --- */
-
-        /* 1. Верхняя панель пользователя */
-        .player-top-panel {
+        .video-thumbnail {
             position: absolute;
-            top: 20px;
-            left: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Чтобы картинка заполнила весь блок без искажений */
         }
 
-        /* Иконка пользователя (зеленый круг с лягушкой) */
-        .user-icon {
-            width: 32px;
-            height: 32px;
-            background-color: #43a047; /* Зеленый цвет */
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 18px;
-        }
-
-        /* Текст имени пользователя */
-        .user-name {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 14px;
-        }
-
-        /* 2. Центральная кнопка воспроизведения (красный треугольник) */
-        .play-button {
+        /* Значок Play поверх превью */
+        .play-icon {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             width: 60px;
-            height: 60px;
-            background-color: #ff0000; /* Красный цвет */
-            border-radius: 50%;
+            height: 40px;
+            background-color: rgba(255, 0, 0, 0.85);
+            border-radius: 10px;
             display: flex;
             justify-content: center;
             align-items: center;
-            color: #ffffff;
-            font-size: 28px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            cursor: pointer;
-        }
-        /* Стрелка внутри кнопки */
-        .play-button::after {
-            content: "▶";
-            position: relative;
-            left: 3px; /* Смещаем стрелку в центр */
+            transition: background-color 0.2s;
         }
 
-        /* 3. Нижняя шкала прогресса */
-        .progress-bar {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 6px;
-            background-color: #ffffff; /* Белая линия */
+        .video-link:hover .play-icon {
+            background-color: rgba(255, 0, 0, 1);
         }
 
-        /* 4. Текст "Комментариев" и время (над шкалой) */
-        .player-bottom-content {
-            position: absolute;
-            bottom: 30px;
-            left: 20px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            color: #ffffff;
-            font-size: 16px;
-            background-color: rgba(0, 0, 0, 0.5); /* Полупрозрачный фон */
-            padding: 5px 10px;
-            border-radius: 5px;
-        }
-        .time-icon {
-            opacity: 0.7;
-        }
-        .comments-text {
-            font-weight: 500;
+        .play-icon::after {
+            content: "";
+            border-style: solid;
+            border-width: 8px 0 8px 14px;
+            border-color: transparent transparent transparent #ffffff;
         }
 
-        /* --- Контент под видео --- */
-        .card-content {
-            padding: 15px 20px 20px 20px;
+        /* Инфо о посте */
+        .card-info {
+            padding: 15px;
         }
 
-        /* Верхняя строка: user и дата */
-        .content-header {
+        .card-user {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 12px;
             margin-bottom: 8px;
-        }
-        .meta-user {
-            font-weight: bold;
-            color: #ffffff;
+            font-size: 13px;
+            color: #aaaaaa;
         }
 
-        /* Заголовок "Видеозапись" */
-        .content-title {
+        .user-name {
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        .card-title {
             font-size: 16px;
             font-weight: 600;
             color: #ffffff;
-            margin-bottom: 12px;
         }
-
-        /* Статистика: просмотры, лайки, комментарии */
-        .content-stats {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 12px;
-        }
-        .stat-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        /* Иконки для статистики */
-        .icon {
-            font-size: 14px;
-        }
-        .icon.red {
-            color: #ef5350; /* Красный для лайка */
-        }
-
     </style>
 </head>
 <body>
 
-    <!-- Карточка -->
-    <div class="card">
-        <!-- Псевдо-видео-плеер (самый сложный блок) -->
-        <div class="video-thumbnail">
-            <!-- Верхняя панель (иконка лягушки) -->
-            <div class="player-top-panel">
-                <div class="user-icon">🐸</div>
-                <div class="user-name">Тучный Жа6</div>
-            </div>
+    <header>
+        <a href="#" class="logo"><span>🐸</span> ebalo.id</a>
+        <nav><a href="#">Лента</a></nav>
+    </header>
 
-            <!-- Центральная кнопка Play -->
-            <div class="play-button"></div>
-
-            <!-- Нижняя панель (над шкалой) -->
-            <div class="player-bottom-content">
-                <span class="time-icon">🕒</span>
-                <span class="comments-text">Комментариев</span>
-            </div>
-
-            <!-- Шкала прогресса -->
-            <div class="progress-bar"></div>
-        </div>
-
-        <!-- Контент под видео -->
-        <div class="card-content">
-            <div class="content-header">
-                <span class="meta-user">user</span>
-                <span class="meta-date">сегодня</span>
-            </div>
-            <h2 class="content-title">Видеозапись</h2>
-            <div class="content-stats">
-                <div class="stat-item"><span class="icon">👁</span> 100</div>
-                <div class="stat-item"><span class="icon red">❤️</span> 15</div>
-                <div class="stat-item"><span class="icon">💬</span> 3</div>
+    <main class="container">
+        <div class="feed-grid">
+            <div class="card">
+                <!-- Ссылка на видео с превьюшкой -->
+                <a href="https://www.youtube.com/watch?v=iztO22wM9dI" target="_blank" class="video-link">
+                    <img src="https://img.youtube.com/vi/iztO22wM9dI/hqdefault.jpg" alt="Превью" class="video-thumbnail">
+                    <div class="play-icon"></div>
+                </a>
+                
+                <div class="card-info">
+                    <div class="card-user">
+                        <span class="user-name">user</span>
+                        <span>сегодня</span>
+                    </div>
+                    <div class="card-title">Видеозапись</div>
+                </div>
             </div>
         </div>
-    </div>
+    </main>
 
 </body>
 </html>
