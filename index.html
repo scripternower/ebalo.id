@@ -43,6 +43,7 @@
             height: 32px;
             border-radius: 50%;
             object-fit: cover;
+            background-color: #333;
         }
 
         nav a {
@@ -113,6 +114,7 @@
             align-items: center;
             justify-content: center;
             transition: background-color 0.2s;
+            z-index: 2;
         }
 
         .thumb-wrapper:hover .play-btn {
@@ -155,7 +157,11 @@
 
     <header>
         <a href="#" class="logo">
-            <img src="https://i.pinimg.com/736x/12/69/82/1269823620ab6546fba9644d1f741193.jpg" alt="Логотип" class="logo-img">
+            <img 
+                src="https://i.pinimg.com/736x/12/69/82/1269823620ab6546fba9644d1f741193.jpg" 
+                alt="Логотип" 
+                class="logo-img"
+            >
             ebalo.id
         </a>
         <nav><a href="#">Лента</a></nav>
@@ -165,7 +171,11 @@
         <div class="feed-grid">
             <div class="card">
                 <a href="https://www.youtube.com/watch?v=iztO22wM9dI" target="_blank" class="thumb-wrapper">
-                    <img src="https://img.youtube.com/vi/iztO22wM9dI/maxresdefault.jpg" alt="Превью" class="thumb-img">
+                    <img 
+                        src="https://img.youtube.com/vi/iztO22wM9dI/hqdefault.jpg" 
+                        alt="Превью" 
+                        class="thumb-img"
+                    >
                     <div class="play-btn"></div>
                 </a>
                 
