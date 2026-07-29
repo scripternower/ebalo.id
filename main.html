@@ -18,7 +18,7 @@
             min-height: 100vh;
         }
 
-        /* Шапка сайта */
+        /* Шапка */
         header {
             display: flex;
             align-items: center;
@@ -38,11 +38,6 @@
             gap: 8px;
         }
 
-        nav {
-            display: flex;
-            gap: 20px;
-        }
-
         nav a {
             color: #76b900;
             text-decoration: none;
@@ -52,38 +47,30 @@
             border-bottom: 2px solid #76b900;
         }
 
-        /* Контейнер ленты */
+        /* Лента */
         .container {
             max-width: 1200px;
             margin: 30px auto;
             padding: 0 20px;
         }
 
-        /* Сетка постов */
         .feed-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
             gap: 20px;
         }
 
-        /* Карточка поста */
         .card {
             background-color: #242424;
             border-radius: 12px;
             overflow: hidden;
             border: 1px solid #333333;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
         }
 
         .video-container {
             position: relative;
             width: 100%;
-            padding-top: 56.25%; /* Соотношение сторон 16:9 */
+            padding-top: 56.25%; /* 16:9 - обычное соотношение */
             background-color: #000;
         }
 
@@ -102,7 +89,6 @@
 
         .card-user {
             display: flex;
-            align-items: center;
             justify-content: space-between;
             margin-bottom: 10px;
             font-size: 13px;
@@ -117,43 +103,27 @@
         .card-title {
             font-size: 16px;
             font-weight: 600;
-            margin-bottom: 8px;
             color: #ffffff;
         }
 
-        .card-stats {
-            display: flex;
-            gap: 15px;
-            font-size: 12px;
-            color: #888888;
-            margin-top: 10px;
-        }
     </style>
 </head>
 <body>
 
-    <!-- Шапка -->
     <header>
-        <a href="#" class="logo">
-            <span>🐸</span> ebalo.id
-        </a>
-        <nav>
-            <a href="#">Лента</a>
-        </nav>
+        <a href="#" class="logo"><span>🐸</span> ebalo.id</a>
+        <nav><a href="#">Лента</a></nav>
     </header>
 
-    <!-- Основная лента -->
     <main class="container">
         <div class="feed-grid">
-
-            <!-- Карточка с видео -->
             <div class="card">
                 <div class="video-container">
+                    <!-- Обычное встраивание iframe 16:9 -->
                     <iframe 
-                        src="https://www.youtube-nocookie.com/embed/iztO22wM9dI" 
+                        src="https://www.youtube.com/embed/iztO22wM9dI?rel=0&amp;showinfo=0" 
                         title="YouTube video player" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                        referrerpolicy="strict-origin-when-cross-origin"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                         allowfullscreen>
                     </iframe>
                 </div>
@@ -163,14 +133,9 @@
                         <span>сегодня</span>
                     </div>
                     <div class="card-title">Видеозапись</div>
-                    <div class="card-stats">
-                        <span>👁 100</span>
-                        <span>❤️ 15</span>
-                        <span>💬 3</span>
-                    </div>
+                    <!-- Блок статистики удален -->
                 </div>
             </div>
-
         </div>
     </main>
 
