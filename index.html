@@ -55,13 +55,56 @@
             border-bottom: 2px solid #76b900;
         }
 
-        /* Лента */
+        /* Контейнер */
         .container {
             max-width: 1200px;
             margin: 30px auto;
             padding: 0 20px;
         }
 
+        /* Форма добавления видео */
+        .publish-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            background-color: #242424;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #333333;
+        }
+
+        .publish-input {
+            flex: 1;
+            padding: 12px 16px;
+            background-color: #1a1a1a;
+            border: 1px solid #333333;
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .publish-input:focus {
+            border-color: #76b900;
+        }
+
+        .publish-btn {
+            padding: 12px 24px;
+            background-color: #76b900;
+            color: #121212;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .publish-btn:hover {
+            background-color: #8ce000;
+        }
+
+        /* Лента */
         .feed-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
@@ -81,7 +124,7 @@
             transform: translateY(-4px);
         }
 
-        /* Область превью 16:9 */
+        /* Превью 16:9 */
         .thumb-wrapper {
             display: block;
             position: relative;
@@ -128,7 +171,7 @@
             border-color: transparent transparent transparent #ffffff;
         }
 
-        /* Информация под видео */
+        /* Инфо о посте */
         .card-info {
             padding: 15px;
         }
@@ -168,17 +211,40 @@
     </header>
 
     <main class="container">
-        <div class="feed-grid">
+        <!-- Форма для вставки ссылки -->
+        <div class="publish-form">
+            <input 
+                type="text" 
+                id="youtubeUrl" 
+                class="publish-input" 
+                placeholder="Вставьте ссылку на YouTube видео..."
+            >
+            <button class="publish-btn" onclick="addVideo()">Опубликовать</button>
+        </div>
+
+        <!-- Лента карточек -->
+        <div class="feed-grid" id="feedGrid">
+            <!-- Первое видео -->
             <div class="card">
                 <a href="https://www.youtube.com/watch?v=iztO22wM9dI" target="_blank" class="thumb-wrapper">
-                    <img 
-                        src="https://img.youtube.com/vi/iztO22wM9dI/hqdefault.jpg" 
-                        alt="Превью" 
-                        class="thumb-img"
-                    >
+                    <img src="https://img.youtube.com/vi/iztO22wM9dI/hqdefault.jpg" alt="Превью" class="thumb-img">
                     <div class="play-btn"></div>
                 </a>
-                
+                <div class="card-info">
+                    <div class="card-user">
+                        <span class="user-name">user</span>
+                        <span>сегодня</span>
+                    </div>
+                    <div class="card-title">Видеозапись</div>
+                </div>
+            </div>
+
+            <!-- Второе видео -->
+            <div class="card">
+                <a href="https://www.youtube.com/watch?v=jSDCHwrz1Lo" target="_blank" class="thumb-wrapper">
+                    <img src="https://img.youtube.com/vi/jSDCHwrz1Lo/hqdefault.jpg" alt="Превью" class="thumb-img">
+                    <div class="play-btn"></div>
+                </a>
                 <div class="card-info">
                     <div class="card-user">
                         <span class="user-name">user</span>
@@ -189,6 +255,52 @@
             </div>
         </div>
     </main>
+
+    <script>
+        // Функция извлечения ID видео из ссылки YouTube
+        function extractVideoId(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        // Функция добавления нового видео в ленту
+        function addVideo() {
+            const input = document.getElementById('youtubeUrl');
+            const url = input.value.trim();
+            const videoId = extractVideoId(url);
+
+            if (!videoId) {
+                alert('Пожалуйста, вставьте корректную ссылку на YouTube!');
+                return;
+            }
+
+            const feedGrid = document.getElementById('feedGrid');
+
+            // Создаем новую карточку
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <a href="https://www.youtube.com/watch?v=${videoId}" target="_blank" class="thumb-wrapper">
+                    <img src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg" alt="Превью" class="thumb-img">
+                    <div class="play-btn"></div>
+                </a>
+                <div class="card-info">
+                    <div class="card-user">
+                        <span class="user-name">user</span>
+                        <span>только что</span>
+                    </div>
+                    <div class="card-title">Видеозапись</div>
+                </div>
+            `;
+
+            // Добавляем новое видео в начало ленты
+            feedGrid.prepend(card);
+
+            // Очищаем поле ввода
+            input.value = '';
+        }
+    </script>
 
 </body>
 </html>
