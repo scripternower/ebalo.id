@@ -118,6 +118,7 @@
             overflow: hidden;
             border: 1px solid #333333;
             transition: transform 0.2s ease;
+            position: relative;
         }
 
         .card:hover {
@@ -223,78 +224,82 @@
         </div>
 
         <!-- Лента -->
-        <div class="feed-grid" id="feedGrid">
-
-            <!-- Карточка 1 -->
-            <div class="card">
-                <a href="https://www.youtube.com/watch?v=iztO22wM9dI" target="_blank" class="thumb-wrapper">
-                    <img src="https://img.youtube.com/vi/iztO22wM9dI/hqdefault.jpg" alt="Превью" class="thumb-img">
-                    <div class="play-btn"></div>
-                </a>
-                <div class="card-info">
-                    <div class="card-user">
-                        <span class="user-name">user</span>
-                        <span>сегодня</span>
-                    </div>
-                    <div class="card-title">Видеозапись</div>
-                </div>
-            </div>
-
-            <!-- Карточка 2 -->
-            <div class="card">
-                <a href="https://www.youtube.com/watch?v=jSDCHwrz1Lo" target="_blank" class="thumb-wrapper">
-                    <img src="https://img.youtube.com/vi/jSDCHwrz1Lo/hqdefault.jpg" alt="Превью" class="thumb-img">
-                    <div class="play-btn"></div>
-                </a>
-                <div class="card-info">
-                    <div class="card-user">
-                        <span class="user-name">user</span>
-                        <span>сегодня</span>
-                    </div>
-                    <div class="card-title">Видеозапись</div>
-                </div>
-            </div>
-
-        </div>
+        <div class="feed-grid" id="feedGrid"></div>
     </main>
 
     <script>
+        // Начальный список видео (если хранилище пустое)
+        const initialVideos = [
+            { id: "jSDCHwrz1Lo", date: "сегодня" },
+            { id: "iztO22wM9dI", date: "сегодня" }
+        ];
+
+        // Достаём список из localStorage или берём дефолтный
+        function getSavedVideos() {
+            const saved = localStorage.getItem('my_youtube_videos');
+            return saved ? JSON.parse(saved) : initialVideos;
+        }
+
+        // Сохраняем в localStorage
+        function saveVideos(videos) {
+            localStorage.setItem('my_youtube_videos', JSON.stringify(videos));
+        }
+
+        // Отрисовка всех видео в ленте
+        function renderFeed() {
+            const feedGrid = document.getElementById('feedGrid');
+            feedGrid.innerHTML = ''; // очищаем перед отрисовкой
+            const videos = getSavedVideos();
+
+            videos.forEach(video => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <a href="https://www.youtube.com/watch?v=${video.id}" target="_blank" class="thumb-wrapper">
+                        <img src="https://img.youtube.com/vi/${video.id}/hqdefault.jpg" alt="Превью" class="thumb-img">
+                        <div class="play-btn"></div>
+                    </a>
+                    <div class="card-info">
+                        <div class="card-user">
+                            <span class="user-name">user</span>
+                            <span>${video.date}</span>
+                        </div>
+                        <div class="card-title">Видеозапись</div>
+                    </div>
+                `;
+                feedGrid.appendChild(card);
+            });
+        }
+
+        // Вытаскиваем ID из ссылки
         function extractVideoId(url) {
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
             const match = url.match(regExp);
             return (match && match[2].length === 11) ? match[2] : null;
         }
 
+        // Функция добавления нового видео
         function addVideo() {
             const input = document.getElementById('youtubeUrl');
             const url = input.value.trim();
             const videoId = extractVideoId(url);
 
             if (!videoId) {
-                alert('Вставьте нормальную ссылку на YouTube!');
+                alert('Вставьте корректную ссылку на YouTube!');
                 return;
             }
 
-            const feedGrid = document.getElementById('feedGrid');
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.innerHTML = `
-                <a href="https://www.youtube.com/watch?v=${videoId}" target="_blank" class="thumb-wrapper">
-                    <img src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg" alt="Превью" class="thumb-img">
-                    <div class="play-btn"></div>
-                </a>
-                <div class="card-info">
-                    <div class="card-user">
-                        <span class="user-name">user</span>
-                        <span>только что</span>
-                    </div>
-                    <div class="card-title">Видеозапись</div>
-                </div>
-            `;
+            const videos = getSavedVideos();
+            // Добавляем новое видео в НАЧАЛО массива
+            videos.unshift({ id: videoId, date: "только что" });
 
-            feedGrid.prepend(card);
+            saveVideos(videos);
+            renderFeed();
             input.value = '';
         }
+
+        // Запускаем отрисовку при загрузке страницы
+        renderFeed();
     </script>
 
 </body>
