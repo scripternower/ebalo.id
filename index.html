@@ -209,11 +209,7 @@
 
     <header>
         <a href="#" class="logo">
-            <img 
-                src="https://i.pinimg.com/736x/12/69/82/1269823620ab6546fba9644d1f741193.jpg" 
-                alt="Лого" 
-                class="logo-img"
-            >
+            <img src="https://i.pinimg.com/736x/12/69/82/1269823620ab6546fba9644d1f741193.jpg" alt="Лого" class="logo-img">
             ebalo.id
         </a>
         <nav><a href="#">Лента</a></nav>
@@ -234,16 +230,25 @@
     </main>
 
     <script>
-        // Убедись, что тут вставлены твои актуальные ключи из Supabase (Settings -> API)
+        // Не забудь заменить на свои ключи из Supabase
         const SUPABASE_URL = 'ТВОЙ_PROJECT_URL';
         const SUPABASE_KEY = 'ТВОЙ_ANON_PUBLIC_KEY';
 
-        const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        let db;
+
+        // Безопасная инициализация после загрузки страницы
+        window.addEventListener('DOMContentLoaded', () => {
+            if (window.supabase) {
+                db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                fetchVideos();
+            } else {
+                console.error('Supabase SDK не загрузился');
+            }
+        });
 
         async function fetchVideos() {
             const feedGrid = document.getElementById('feedGrid');
 
-            // Запрашиваем данные без строгого порядка, чтобы избежать ошибки missing column
             const { data, error } = await db
                 .from('videos')
                 .select('*');
@@ -264,7 +269,8 @@
                 return;
             }
 
-            renderFeed(data.reverse()); // Разворачиваем, чтобы новые были сверху
+            // Безопасный разворот массива
+            renderFeed([...data].reverse());
         }
 
         function renderFeed(videos) {
@@ -319,8 +325,6 @@
                 fetchVideos();
             }
         }
-
-        fetchVideos();
     </script>
 
 </body>
