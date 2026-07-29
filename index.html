@@ -19,7 +19,6 @@
             min-height: 100vh;
         }
 
-        /* Шапка */
         header {
             display: flex;
             align-items: center;
@@ -56,14 +55,12 @@
             border-bottom: 2px solid #76b900;
         }
 
-        /* Контейнер */
         .container {
             max-width: 1200px;
             margin: 30px auto;
             padding: 0 20px;
         }
 
-        /* Форма публикации */
         .publish-form {
             display: flex;
             gap: 10px;
@@ -105,14 +102,12 @@
             background-color: #8ce000;
         }
 
-        /* Сетка Ленты */
         .feed-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
             gap: 20px;
         }
 
-        /* Карточка */
         .card {
             background-color: #242424;
             border-radius: 12px;
@@ -125,7 +120,6 @@
             transform: translateY(-4px);
         }
 
-        /* Превью 16:9 */
         .thumb-wrapper {
             display: block;
             position: relative;
@@ -144,7 +138,6 @@
             object-fit: cover;
         }
 
-        /* Кнопка Play */
         .play-btn {
             position: absolute;
             top: 50%;
@@ -172,7 +165,6 @@
             border-color: transparent transparent transparent #ffffff;
         }
 
-        /* Описание карточки */
         .card-info {
             padding: 15px;
         }
@@ -230,47 +222,49 @@
     </main>
 
     <script>
-        // Не забудь заменить на свои ключи из Supabase
-        const SUPABASE_URL = 'sb_publishable_rwQC4kQmW0X6_emf7Sr00g_c4UTc7gC';
-        const SUPABASE_KEY = 'sb_publishable_rwQC4kQmW0X6_emf7Sr00g_c4UTc7gC';
+        const SUPABASE_URL = 'https://kduxsliyemnrztewagaz.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkdXhzbGl5ZW1ucnp0ZXdhZ2F6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzMTkwMjUsImV4cCI6MjEwMDg5NTAyNX0.xA2aWGA1qbfPTGNIYaD0W1x5o6H32OcCR-_-9TBHqDs';
 
         let db;
 
-        // Безопасная инициализация после загрузки страницы
-        window.addEventListener('DOMContentLoaded', () => {
-            if (window.supabase) {
-                db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof supabase !== 'undefined') {
+                db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
                 fetchVideos();
             } else {
-                console.error('Supabase SDK не загрузился');
+                document.getElementById('feedGrid').innerHTML = 
+                    '<div class="error-msg">Ошибка: Библиотека Supabase не загрузилась!</div>';
             }
         });
 
         async function fetchVideos() {
             const feedGrid = document.getElementById('feedGrid');
 
-            const { data, error } = await db
-                .from('videos')
-                .select('*');
+            try {
+                const { data, error } = await db
+                    .from('videos')
+                    .select('*');
 
-            if (error) {
-                console.error('Ошибка Supabase:', error);
-                feedGrid.innerHTML = `
-                    <div class="error-msg">
-                        <b>Ошибка подключения к базе:</b> ${error.message}<br>
-                        Проверь, выключен ли RLS в настройках таблицы Supabase!
-                    </div>
-                `;
-                return;
+                if (error) {
+                    console.error('Ошибка Supabase:', error);
+                    feedGrid.innerHTML = `
+                        <div class="error-msg">
+                            <b>Ошибка базы данных:</b> ${error.message}<br>
+                            Убедись, что создана таблица 'videos' и отключен/настроен RLS!
+                        </div>
+                    `;
+                    return;
+                }
+
+                if (!data || data.length === 0) {
+                    feedGrid.innerHTML = '<p style="color: #aaa;">Лента пока пуста. Опубликуй первое видео!</p>';
+                    return;
+                }
+
+                renderFeed([...data].reverse());
+            } catch (err) {
+                feedGrid.innerHTML = `<div class="error-msg"><b>Ошибка скрипта:</b> ${err.message}</div>`;
             }
-
-            if (!data || data.length === 0) {
-                feedGrid.innerHTML = '<p style="color: #aaa;">Лента пока пуста. Опубликуй первое видео!</p>';
-                return;
-            }
-
-            // Безопасный разворот массива
-            renderFeed([...data].reverse());
         }
 
         function renderFeed(videos) {
@@ -309,7 +303,7 @@
             const videoId = extractVideoId(url);
 
             if (!videoId) {
-                alert('Вставьте нормальную ссылку на YouTube!');
+                alert('Вставьте корректную ссылку на YouTube!');
                 return;
             }
 
